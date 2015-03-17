@@ -1,0 +1,20 @@
+<div id="lframe">
+  <form action="http://hero.dev/google" method="get">
+    <input type="text" name="q" />
+  </form>
+  <p><strong>query: </strong><%= @json['query'] %></p>
+  <p><strong>when: </strong><%= @json['when'] %></p>
+  <p><strong>epoch: </strong><%= @json['epoch'] %></p>
+  <p><a href="<%= @abs_log %>" target="_blank"><%= @abs_log %></a></p>
+  <div id="queries" style="overflow: scroll; height: 100px; width: 100%">
+    <% @json['queries'].each do |oldsearch| %>
+      <%= raw oldsearch %>
+    <% end %>
+  </div>
+  <% [*@json['links']].each do |r| %>
+    <a target="rframe" href="<%= r['iurl'] %>"><%= r['title'] %></a><br/>
+    <%= r['title'] %><br/>
+    <br/>
+  <% end %>
+</div>
+<iframe id="rframe" name="rframe" src="<%= @json['links'].first['iurl'] %>"></iframe>
