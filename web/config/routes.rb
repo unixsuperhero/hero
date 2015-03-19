@@ -1,6 +1,7 @@
 HeroServer::Application.routes.draw do
   #get '/google(/:q)' => 'bins#google', as: :google
   get '/google(/:q)' => 'bins#new_google', as: :google
+  get '/ping' => 'application#ping', as: :ping
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
