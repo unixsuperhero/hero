@@ -1,0 +1,74 @@
+<html>
+<head>
+<style type="text/css">
+  #container {
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+    padding: 0;
+  }
+  #container textarea {
+    width: 100%;
+    height: 100%;
+  }
+  #formtarget {
+    //width: 1px;
+    //height: 1px;
+    //display: none;
+  }
+</style>
+
+  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+</head>
+<body>
+
+
+
+<div id="container">
+  <p id="status">status: ...</p>
+  <p id="responsedata">data: ...</p>
+  <br />
+  <form action="/scratch/save" method="post" target="formtarget">
+    <textarea id="scratchdata" name="data"><%= @scratch.data %></textarea>
+    <input type="submit" />
+  </form>
+</div>
+
+<script type="text/javascript">
+  window.last_timer = null;
+
+  window.autosave = function(t) {
+    $('#status').text('status: saving...');
+    $('#responsedata').text('data: saving...');
+    console.log(['in autosave, target => ', t]);
+    data = t.val();
+    console.log(['data: ', data]);
+    $.post('/scratch/save', { data: data }, function(d,s,x) {
+        console.log({'real status': s, 'status': d.status, 'data': d.data});
+        $('#status').text('status: ' + d.status);
+        $('#responsedata').text('data: ' + d.data);
+    });
+  }
+
+  window.autosave_timer = function(target) {
+    console.log(['in timer, target => ', target]);
+
+    $('#status').text('status: waiting...');
+    $('#responsedata').text('data: waiting...');
+    if(window.last_timer != null)
+      window.clearTimeout(window.last_timer);
+
+    window.last_timer = setTimeout(autosave, 1000, target);
+  };
+
+  $(document).ready(function() {
+    $('#scratchdata').keypress(function(e) {
+      t = $(e.target);
+      autosave_timer(t);
+    });
+  });
+</script>
+
+
+</body>
+</html>
