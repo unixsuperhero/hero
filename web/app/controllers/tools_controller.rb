@@ -1,13 +1,10 @@
-class BinsController < ApplicationController
-  def google
-    fork do
-      system(format("%s/bin/google", ENV['HOME']), *params[:q])
-      exit
-    end
-    render text: 'google: ok'
-  end
+class ToolsController < ApplicationController
+  layout false
 
-  def new_google
+  skip_before_action :verify_authenticity_token, only: [:scratch, :scratch_save]
+  before_action :set_scratch, only: [:scratch, :scratch_save]
+
+  def google
     log_dir = format('%s/google', './public')
     FileUtils.mkdir_p log_dir
 
@@ -39,6 +36,21 @@ class BinsController < ApplicationController
     }
 
     @json.merge!('queries' => @queries)
-    render :new_google, layout: 'bins'
+  end
+
+  def scratch_save
+    data = params[:data]
+
+    if @scratch.update(data: data)
+      render json: {status: 'saved', data: format("%d lines, %d bytes saved", data.lines.count, data.length)}
+    else
+      render json: {status: 'error', data: format("unknown error occurred: %s", @status.errors.full_messages)}
+    end
+  end
+
+  private
+
+  def set_scratch
+    @scratch = Scratch.find_or_create_by(id: 1)
   end
 end
