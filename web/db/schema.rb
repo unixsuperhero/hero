@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150319230030) do
+ActiveRecord::Schema.define(version: 20150320001438) do
 
   create_table "hashtags", force: true do |t|
     t.integer  "tag_id"
@@ -35,6 +35,12 @@ ActiveRecord::Schema.define(version: 20150319230030) do
   create_table "notes", force: true do |t|
     t.string   "name"
     t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scratches", force: true do |t|
+    t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

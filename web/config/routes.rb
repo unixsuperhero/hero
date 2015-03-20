@@ -7,6 +7,15 @@ HeroServer::Application.routes.draw do
   post '/scratch/save' => 'tools#scratch_save', as: :scratch_save
 
 
+  scope '/notes' do
+    get '/' => 'notes#index', as: :notes
+    get '/tags' => 'notes#tags', as: :notes_tags
+    get '/no_tag' => 'notes#no_tag', as: :notes_no_tag
+    get '/tag/:tag' => 'notes#tag', as: :notes_tag
+    get '/show/:id' => 'notes#show', as: :notes_show
+    get '/edit/:id' => 'notes#edit', as: :notes_edit
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
