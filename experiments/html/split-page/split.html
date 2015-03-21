@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <style type="text/css">
+      #lsplit,#rsplit {
+        width: 50%;
+        float: left;
+      }
+      #lframe,#rframe {
+        width: 100%;
+        height: 80%;
+        border: solid 1px black;
+      }
+    </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <body>
+      <div id="lsplit">
+        <input type="text" id="ltext" /> <br/>
+        <a id="llink" href="about:blank" target="lframe">about:blank</a> <br/>
+        <iframe id="lframe" name="lframe" src="about:blank"></iframe>
+      </div>
+      <div id="rsplit">
+        <input type="text" id="rtext" /> <br/>
+        <a id="rlink" href="about:blank" target="rframe">about:blank</a> <br/>
+        <iframe id="rframe" name="rframe" src="about:blank"></iframe>
+      </div>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('input#ltext').on('keydown', function(e) {
+              console.log('ltext keydown');
+            el = e.target;
+            link = $(el).val();
+            $('#llink').attr('href', link);
+            $('#llink').text(link);
+          });
+          $('input#rtext').on('keydown', function(e) {
+            console.log('rtext keydown');
+            el = e.target;
+            link = $(el).val();
+            $('#rlink').attr('href', link);
+            $('#rlink').text(link);
+          });
+        });
+      </script>
+    </body>
+</html>

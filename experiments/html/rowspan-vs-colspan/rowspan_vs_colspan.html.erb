@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <style type="text/css">
+      th, td, thead, tbody, table {
+        border: solid 1px black;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+<%
+  names = {}
+  names['Name One'] = {colspan: (rand(5) + 1) * 3}
+  names['Name Two'] = {colspan: (rand(5) + 1) * 3}
+  names['Name Three'] = {colspan: (rand(5) + 1) * 3}
+%>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <% names.each do |name,attrs| %>
+            <th <%= attrs.map{|k,v| '%s="%s"' % [k,v] }.join(' ') %>><%= '%-s (%s)' % [name, attrs[:colspan]] %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% hrs = [9,10]; mins = [0,30] %>
+        <% hrs.each do |hr| %>
+          <% mins.each do |min| %>
+            <tr>
+              <td><%= '%02d:%02d' % [hr,min.to_i] %></td>
+              <% names.each do |name,attrs| %>
+                <% 1.upto(attrs[:colspan] / 3).each do %>
+                  <td>1</td>
+                  <td>2</td>
+                  <td>&nbsp;</td>
+                <% end %>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </body>
+</html>
