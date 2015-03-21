@@ -16,12 +16,13 @@ module H
       end
 
       def run(args=ARGV.clone)
-        new(args).run
+        new(args).tap(&:run)
       end
     end
 
-    attr_accessor :args, :options
+    attr_accessor :original_args, :args, :options, :returned_with
     def initialize(args=ARGV.clone)
+      @original_args = args.clone
       @args = args
       @options = Mash.new
 
@@ -39,7 +40,7 @@ module H
     end
 
     def run
-      "running the #{self.class.name} command"
+      @returned_with = "running the #{self.class.name} command"
     end
   end
 
@@ -83,9 +84,23 @@ module H
   end
 end
 
-ap return: H.run
+runner = H.run
+
+ap runner: runner, returned_with: runner.returned_with
 
 __END__
+
+{
+       :args => [],
+    :options => {
+        "name" => "josh"
+    }
+}
+{
+           :runner => #<H::BinNameHere::Add:0x007f958908abd0 @args=[], @options=<Mash name="josh">, @returned_with="running the H::BinNameHere::Add command">,
+    :returned_with => "running the H::BinNameHere::Add command"
+}
+
 
 # ran from intentionally bad subcommand
 {
