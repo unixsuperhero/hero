@@ -34,4 +34,5 @@ Functions:
   visually selected lines
   * ideally, i want users to be able to setup multiple notes within a scratch
     file, and save them 1-by-1.
+  * pipe a visual selection to a command using: `:'<,'>w !herodoc parse`
 
