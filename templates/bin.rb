@@ -61,7 +61,7 @@ module H
 
 
   class << self
-    def run(args=ARGV.dup)
+    def run(args=ARGV.clone)
       subcmd = args.shift
 
       handler = handlers.find do |cmdhandler|
@@ -80,6 +80,9 @@ module H
     end
   end
 end
+
+ap argv: ARGV, options: ARGV.respond_to?(:options)
+ap argv_clone: ARGV, options_clone: ARGV.respond_to?(_clone:options)
 
 ap H.run
 
