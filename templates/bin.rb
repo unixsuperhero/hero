@@ -26,6 +26,8 @@ module H
       @options = Mash.new
 
       parse_options
+
+      ap args: args, options: options
     end
 
     def parse_options
@@ -33,7 +35,7 @@ module H
         opts.on('-n', '--name=NAME', 'set the name') do |name|
           options.name = name
         end
-      end
+      end.parse!(args)
     end
 
     def run
@@ -81,12 +83,35 @@ module H
   end
 end
 
-ap argv: ARGV, options: ARGV.respond_to?(:options)
-ap argv_clone: ARGV, options_clone: ARGV.respond_to?(_clone:options)
-
-ap H.run
+ap return: H.run
 
 __END__
+
+# ran from intentionally bad subcommand
+{
+    :return => "command not found"
+}
+
+
+# ran from add subcommand
+{
+       :args => [],
+    :options => {
+        "name" => "josh"
+    }
+}
+{
+    :return => "running the H::BinNameHere::Add command"
+}
+
+
+{
+    :parsed => {}
+}
+{
+    :return => "running the H::BinNameHere::Add command"
+}
+
 
 
 
