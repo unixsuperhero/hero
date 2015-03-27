@@ -8,6 +8,7 @@ gem 'asciiart'
 gem 'pry'
 gem 'pry-doc'
 gem 'faker'
+gem 'nokogiri'
 
 #gem 'rails', '4.0.3'
 
