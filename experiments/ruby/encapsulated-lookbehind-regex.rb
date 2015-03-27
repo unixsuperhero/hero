@@ -7,7 +7,7 @@ module H
 
   def test #(args=ARGV.dup)
     s = '#one #two #three doesnot#count me n#either #four'
-    matches = {
+    matches = { # !> assigned but unused variable - matches
       encapsulated: s.scan(/(?<=(?<!\S)#)\w+/),
       back2back: s.scan(/(?<!\S)(?<=#)\w+/),
     }
@@ -17,17 +17,12 @@ end
 puts H.test.ai(raw: true, plain: false, index: false) # => nil
 # ap H.test ARGV.clone
 
-# >> [
-# >>     [
-# >>         IO < Object,
-# >>         false,
-# >>         0,
-# >>         true
+# >> {
+# >>     :encapsulated => [
+# >>         "one",
+# >>         "two",
+# >>         "three",
+# >>         "four"
 # >>     ],
-# >>     [
-# >>         IO < Object,
-# >>         true,
-# >>         18,
-# >>         true
-# >>     ]
-# >> ]
+# >>        :back2back => []
+# >> }
