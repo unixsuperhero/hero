@@ -1,30 +1,29 @@
 require 'mash'
+require 'awesome_print'
 
 class BaseStatus
   class << self
     attr_reader :mapping, :ids, :names, :id_map, :name_map
 
     attr_reader :example_status_a, :example_status_b
-  end
 
-  EXAMPLE_STATUS_A = 0
-  EXAMPLE_STATUS_B = 1
+    EXAMPLE_STATUS_A = 0
+    EXAMPLE_STATUS_B = 1
 
-  @@example_status_a = EXAMPLE_STATUS_A
-  @@example_status_b = EXAMPLE_STATUS_B
+    @example_status_a = EXAMPLE_STATUS_A
+    @example_status_b = EXAMPLE_STATUS_B
 
-  @@mapping = {
-    EXAMPLE_STATUS_A => 'example_status_a',
-    EXAMPLE_STATUS_B => 'example_status_b',
-  }.to_mash
+    @mapping = {
+      EXAMPLE_STATUS_A => 'example_status_a',
+      EXAMPLE_STATUS_B => 'example_status_b',
+    }.to_mash
 
-  @@ids = @@mapping.keys
-  @@names = @@mapping.values
+    @ids = @mapping.keys
+    @names = @mapping.values
 
-  @@id_map = @@mapping.invert.with_indifferent_access
-  @@name_map = @@mapping
+    @id_map = @mapping.invert.to_mash
+    @name_map = @mapping
 
-  class << self
     def by_id(id=ids.first)
       new(id)
     end
@@ -147,7 +146,7 @@ class BaseStatusTwo
     end
 
     def id_map
-      @@id_map ||= @@mapping.invert.with_indifferent_access
+      @@id_map ||= @@mapping.invert.to_mash
     end
 
     def name_map
@@ -290,5 +289,30 @@ end
 
 TestAutoGeneratingEverything.IMPORTED # =>
 
-# ~> -:4:in `<class:BaseStatus>': undefined method `cattr_reader' for BaseStatus:Class (NoMethodError)
-# ~> 	from -:3:in `<main>'
+# ~> -:40:in `name_for': undefined method `fetch' for nil:NilClass (NoMethodError)
+# ~> 	from -:47:in `initialize'
+# ~> 	from -:28:in `new'
+# ~> 	from -:28:in `by_id'
+# ~> 	from -:263:in `block in <main>'
+# ~> 	from -:262:in `map'
+# ~> 	from -:262:in `<main>'
+# >> {
+# >>              :name => "TestAutoGeneratingEverything",
+# >>     :constant_name => :IMPORTED
+# >> }
+# >> {
+# >>              :name => "TestAutoGeneratingEverything",
+# >>     :constant_name => :WALKED
+# >> }
+# >> {
+# >>              :name => "TestAutoGeneratingEverything",
+# >>     :constant_name => :WORKED
+# >> }
+# >> {
+# >>              :name => "TestAutoGeneratingEverything",
+# >>     :constant_name => :COMPLETED
+# >> }
+# >> {
+# >>              :name => "TestAutoGeneratingEverything",
+# >>     :constant_name => :HIDDEN
+# >> }
