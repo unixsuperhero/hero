@@ -276,15 +276,17 @@ end
 # needs to be at the bottom, after the constants are defined
 
 module StatusObject
-  @mapping = {}
-  class << self
-    attr_reader :mapping
-  end
 
   def self.extended(base)
+    base.instance_eval <<-INST
+      @mapping = {}
+      class << self
+        attr_reader :mapping
+      end
+    INST
+
     base.constants.each do |c|
       val = base.const_get(c)
-
       base.instance_eval <<-INST
         @#{c.downcase} = #{val}
         @mapping.merge!(@#{c.downcase} => #{val})
@@ -294,16 +296,19 @@ module StatusObject
         end
       INST
     end
+
+    base.instance_eval <<-INST
+      @ids = @mapping.keys
+      @names = @mapping.values
+
+      @id_map = @mapping.invert.to_mash
+      @name_map = @mapping
+      class << self
+        attr_reader :ids, :names, :id_map, :name_map
+      end
+    INST
   end
 
-  @ids = @mapping.keys
-  @names = @mapping.values
-
-  @id_map = @mapping.invert.to_mash
-  @name_map = @mapping
-  class << self
-    attr_reader :ids, :names, :id_map, :name_map
-  end
 end
 
 class TestAutoGeneratingEverything
@@ -356,7 +361,7 @@ CarStatusTwo.mapping # => <Mash 0="imported" 1="walked" 2="worked" 3="completed"
 CarStatusTwo.mapping_two # => <Mash 0="imported" 1="walked" 2="worked" 3="completed" 4="hidden">
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007fd2998f8928 @id=0, @name=nil>, #<CarStatusTwo:0x007fd2998f33d8 @id=1, @name=nil>, #<CarStatusTwo:0x007fd2998f1d08 @id=2, @name=nil>, #<CarStatusTwo:0x007fd2998f0728 @id=3, @name=nil>, #<CarStatusTwo:0x007fd2998eec48 @id=4, @name=nil>
+  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007fcde08a85f8 @id=0, @name=nil>, #<CarStatusTwo:0x007fcde08a6938 @id=1, @name=nil>, #<CarStatusTwo:0x007fcde08a4980 @id=2, @name=nil>, #<CarStatusTwo:0x007fcde11864b8 @id=3, @name=nil>, #<CarStatusTwo:0x007fcde1184398 @id=4, @name=nil>
   cs.id # => 0, 1, 2, 3, 4
   cs.name # => nil, nil, nil, nil, nil
   cs.display # => "", "", "", "", ""
@@ -369,31 +374,11 @@ CarStatusTwo.mapping_two # => <Mash 0="imported" 1="walked" 2="worked" 3="comple
   }
 end
 
-TestAutoGeneratingEverything::WALKED # =>
-TestAutoGeneratingEverything.walked # =>
-TestAutoGeneratingEverything.ids # =>
-TestAutoGeneratingEverything.names # =>
-TestAutoGeneratingEverything.id_map # =>
-TestAutoGeneratingEverything.name_map # =>
-TestAutoGeneratingEverything.mapping # =>
+TestAutoGeneratingEverything::WALKED # => 1
+TestAutoGeneratingEverything.walked # => 1
+TestAutoGeneratingEverything.ids # => [0, 1, 2, 3, 4]
+TestAutoGeneratingEverything.names # => [0, 1, 2, 3, 4]
+TestAutoGeneratingEverything.id_map # => <Mash 0=0 1=1 2=2 3=3 4=4>
+TestAutoGeneratingEverything.name_map # => {0=>0, 1=>1, 2=>2, 3=>3, 4=>4}
+TestAutoGeneratingEverything.mapping # => {0=>0, 1=>1, 2=>2, 3=>3, 4=>4}
 
-# >> {
-# >>              :name => "TestAutoGeneratingEverything",
-# >>     :constant_name => :IMPORTED
-# >> }
-# >> {
-# >>              :name => "TestAutoGeneratingEverything",
-# >>     :constant_name => :WALKED
-# >> }
-# >> {
-# >>              :name => "TestAutoGeneratingEverything",
-# >>     :constant_name => :WORKED
-# >> }
-# >> {
-# >>              :name => "TestAutoGeneratingEverything",
-# >>     :constant_name => :COMPLETED
-# >> }
-# >> {
-# >>              :name => "TestAutoGeneratingEverything",
-# >>     :constant_name => :HIDDEN
-# >> }
