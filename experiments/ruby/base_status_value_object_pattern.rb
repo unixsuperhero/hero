@@ -276,7 +276,26 @@ end
 # needs to be at the bottom, after the constants are defined
 
 module StatusObject
+  def self.included(base)
+    base.extend ClassDefinitions
+  end
 
+  attr_reader :id, :name
+  def initialize(id)
+    @id = id
+    @name = @id_map.invert[id]
+  end
+
+  @id_map.each do |name,val|
+    define_method(:"#{name}?") { id == val }
+  end
+
+  module ClassDefinitions
+    @id_map.each do |name,val|
+      const_set(name.upcase.to_sym, val)
+      define_method(name.to_sym, val)
+    end
+  end
   def self.extended(base)
     base.instance_eval <<-INST
       @mapping = {}
@@ -309,29 +328,27 @@ module StatusObject
     INST
 
     base.class_eval <<-"CLASS"
-      class << self
-        def by_id(id=ids.first)
+        def self.by_id(id=ids.first)
           new(id)
         end
 
-        def by_name(name=names.first)
+        def self.by_name(name=names.first)
           by_id(id_for name)
         end
 
-        def id_for(name=names.first)
+        def self.id_for(name=names.first)
           id_map.fetch name
         end
 
-        def name_for(id=ids.first)
+        def self.name_for(id=ids.first)
           name_map.fetch id
         end
 
-        def options_for_select
+        def self.options_for_select
           id_map.map do |name,id|
             [new(id).display, id]
           end
         end
-      end
 
       attr_accessor :id, :name
       def initialize(id=self.class.ids.first)
@@ -340,7 +357,7 @@ module StatusObject
       end
 
       def display
-        name.titleize
+        name.gsub(/_+/, ' ').split(/\\s+/).map(&:capitalize).join(' ')
       end
     CLASS
 
@@ -405,7 +422,7 @@ CarStatusTwo.mapping # => <Mash 0="imported" 1="walked" 2="worked" 3="completed"
 CarStatusTwo.mapping_two # => <Mash 0="imported" 1="walked" 2="worked" 3="completed" 4="hidden">
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007ff34397d950 @id=0, @name=nil>, #<CarStatusTwo:0x007ff343977ac8 @id=1, @name=nil>, #<CarStatusTwo:0x007ff343975548 @id=2, @name=nil>, #<CarStatusTwo:0x007ff34396d708 @id=3, @name=nil>, #<CarStatusTwo:0x007ff343967ce0 @id=4, @name=nil>
+  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007f8589113a80 @id=0, @name=nil>, #<CarStatusTwo:0x007f85891111b8 @id=1, @name=nil>, #<CarStatusTwo:0x007f85891090a8 @id=2, @name=nil>, #<CarStatusTwo:0x007f8588921a70 @id=3, @name=nil>, #<CarStatusTwo:0x007f858891a158 @id=4, @name=nil>
   cs.id # => 0, 1, 2, 3, 4
   cs.name # => nil, nil, nil, nil, nil
   cs.display # => "", "", "", "", ""
@@ -426,15 +443,15 @@ TestAutoGeneratingEverything.id_map # => <Mash completed=3 hidden=4 imported=0 w
 TestAutoGeneratingEverything.name_map # => {0=>"imported", 1=>"walked", 2=>"worked", 3=>"completed", 4=>"hidden"}
 TestAutoGeneratingEverything.mapping # => {0=>"imported", 1=>"walked", 2=>"worked", 3=>"completed", 4=>"hidden"}
 
-tage = TestAutoGeneratingEverything.by_id(2) # =>
-tage.id # =>
-tage.name # =>
-tage.display # =>
-tage.imported? # =>
-tage.walked? # =>
-tage.worked? # =>
-tage.completed? # =>
-tage.hidden? # =>
+tage = TestAutoGeneratingEverything.by_id(2) # => #<TestAutoGeneratingEverything:0x007f8588911f80 @id=2, @name="worked">
+tage.id # => 2
+tage.name # => "worked"
+tage.display # => "Worked"
+tage.imported? # => false
+tage.walked? # => false
+tage.worked? # => true
+tage.completed? # => false
+tage.hidden? # => false
 
 
 
