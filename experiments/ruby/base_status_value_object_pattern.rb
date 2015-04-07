@@ -289,7 +289,7 @@ module StatusObject
       val = base.const_get(c)
       base.instance_eval <<-INST
         @#{c.downcase} = #{val}
-        @mapping.merge!(@#{c.downcase} => #{val})
+        @mapping.merge!(@#{c.downcase} => '#{c.downcase}')
 
         class << self
           attr_reader :#{c.downcase}
@@ -307,6 +307,50 @@ module StatusObject
         attr_reader :ids, :names, :id_map, :name_map
       end
     INST
+
+    base.class_eval <<-"CLASS"
+      class << self
+        def by_id(id=ids.first)
+          new(id)
+        end
+
+        def by_name(name=names.first)
+          by_id(id_for name)
+        end
+
+        def id_for(name=names.first)
+          id_map.fetch name
+        end
+
+        def name_for(id=ids.first)
+          name_map.fetch id
+        end
+
+        def options_for_select
+          id_map.map do |name,id|
+            [new(id).display, id]
+          end
+        end
+      end
+
+      attr_accessor :id, :name
+      def initialize(id=self.class.ids.first)
+        @id = id
+        @name = self.class.name_for(id)
+      end
+
+      def display
+        name.titleize
+      end
+    CLASS
+
+    base.constants.each do |c|
+      base.class_eval <<-"CLASS"
+        def #{c.downcase}?
+          id == #{c}
+        end
+      CLASS
+    end
   end
 
 end
@@ -361,7 +405,7 @@ CarStatusTwo.mapping # => <Mash 0="imported" 1="walked" 2="worked" 3="completed"
 CarStatusTwo.mapping_two # => <Mash 0="imported" 1="walked" 2="worked" 3="completed" 4="hidden">
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007fcde08a85f8 @id=0, @name=nil>, #<CarStatusTwo:0x007fcde08a6938 @id=1, @name=nil>, #<CarStatusTwo:0x007fcde08a4980 @id=2, @name=nil>, #<CarStatusTwo:0x007fcde11864b8 @id=3, @name=nil>, #<CarStatusTwo:0x007fcde1184398 @id=4, @name=nil>
+  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007ff34397d950 @id=0, @name=nil>, #<CarStatusTwo:0x007ff343977ac8 @id=1, @name=nil>, #<CarStatusTwo:0x007ff343975548 @id=2, @name=nil>, #<CarStatusTwo:0x007ff34396d708 @id=3, @name=nil>, #<CarStatusTwo:0x007ff343967ce0 @id=4, @name=nil>
   cs.id # => 0, 1, 2, 3, 4
   cs.name # => nil, nil, nil, nil, nil
   cs.display # => "", "", "", "", ""
@@ -377,8 +421,22 @@ end
 TestAutoGeneratingEverything::WALKED # => 1
 TestAutoGeneratingEverything.walked # => 1
 TestAutoGeneratingEverything.ids # => [0, 1, 2, 3, 4]
-TestAutoGeneratingEverything.names # => [0, 1, 2, 3, 4]
-TestAutoGeneratingEverything.id_map # => <Mash 0=0 1=1 2=2 3=3 4=4>
-TestAutoGeneratingEverything.name_map # => {0=>0, 1=>1, 2=>2, 3=>3, 4=>4}
-TestAutoGeneratingEverything.mapping # => {0=>0, 1=>1, 2=>2, 3=>3, 4=>4}
+TestAutoGeneratingEverything.names # => ["imported", "walked", "worked", "completed", "hidden"]
+TestAutoGeneratingEverything.id_map # => <Mash completed=3 hidden=4 imported=0 walked=1 worked=2>
+TestAutoGeneratingEverything.name_map # => {0=>"imported", 1=>"walked", 2=>"worked", 3=>"completed", 4=>"hidden"}
+TestAutoGeneratingEverything.mapping # => {0=>"imported", 1=>"walked", 2=>"worked", 3=>"completed", 4=>"hidden"}
+
+tage = TestAutoGeneratingEverything.by_id(2) # =>
+tage.id # =>
+tage.name # =>
+tage.display # =>
+tage.imported? # =>
+tage.walked? # =>
+tage.worked? # =>
+tage.completed? # =>
+tage.hidden? # =>
+
+
+
+
 
