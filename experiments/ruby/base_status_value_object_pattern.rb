@@ -140,6 +140,11 @@ class BaseStatusTwo
     EXAMPLE_STATUS_B => 'example_status_b',
   }.to_mash
 
+  @@mapping_two = {
+    @@example_status_a => 'example_status_a',
+    @@example_status_b => 'example_status_b',
+  }.to_mash
+
   class << self
     def ids
       @@ids ||= @@mapping.keys
@@ -155,6 +160,10 @@ class BaseStatusTwo
 
     def name_map
       @@name_map ||= @@mapping
+    end
+
+    def name_map_two
+      @@name_map_two ||= @@mapping_two
     end
 
     def by_id(id=ids.first)
@@ -196,6 +205,7 @@ end
 class CarStatusTwo < BaseStatusTwo
   class << self
     attr_accessor :imported, :walked, :worked, :completed, :hidden
+    attr_accessor :mapping_two
   end
 
   IMPORTED  = 0
@@ -216,6 +226,14 @@ class CarStatusTwo < BaseStatusTwo
     WORKED    => 'worked',
     COMPLETED => 'completed',
     HIDDEN    => 'hidden',
+  }.to_mash
+
+  @@mapping_two = {
+    @@imported  => 'imported',
+    @@walked    => 'walked',
+    @@worked    => 'worked',
+    @@completed => 'completed',
+    @@hidden    => 'hidden',
   }.to_mash
 
   def imported?
@@ -264,12 +282,11 @@ end
 
 
 CarStatus.ids # => nil
-binding.pry
 CarStatus.names # => nil
 CarStatus.mapping # => nil
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatus.by_id(id) # => #<CarStatus:0x007fef498d79b8 @id=0, @name=nil>, #<CarStatus:0x007fef498d54d8 @id=1, @name=nil>, #<CarStatus:0x007fef498d39f8 @id=2, @name=nil>, #<CarStatus:0x007fef498d15b8 @id=3, @name=nil>, #<CarStatus:0x007fef498cb488 @id=4, @name=nil>
+  cs = CarStatus.by_id(id) # => #<CarStatus:0x007f8189bac450 @id=0, @name=nil>, #<CarStatus:0x007f8189b9f390 @id=1, @name=nil>, #<CarStatus:0x007f8189b9de28 @id=2, @name=nil>, #<CarStatus:0x007f8189b9cd70 @id=3, @name=nil>, #<CarStatus:0x007f8189b9e7b0 @id=4, @name=nil>
   cs.id # => 0, 1, 2, 3, 4
   cs.name # => nil, nil, nil, nil, nil
   cs.display # => "", "", "", "", ""
@@ -281,12 +298,18 @@ CarStatus.mapping # => nil
     hidden?: cs.hidden?
   }
 end
+
+
+CarStatusTwo.ids # => ["0", "1", "2", "3", "4"]
+CarStatusTwo.names # => ["imported", "walked", "worked", "completed", "hidden"]
+CarStatusTwo.name_map # => <Mash 0="imported" 1="walked" 2="worked" 3="completed" 4="hidden">
+CarStatusTwo.name_map_two # =>
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007fef498c9020 @id=0, @name=nil>, #<CarStatusTwo:0x007fef498c61e0 @id=1, @name=nil>, #<CarStatusTwo:0x007fef498c3dc8 @id=2, @name=nil>, #<CarStatusTwo:0x007fef498c2360 @id=3, @name=nil>, #<CarStatusTwo:0x007fef498c0bc8 @id=4, @name=nil>
-  cs.id # => 0, 1, 2, 3, 4
-  cs.name # => nil, nil, nil, nil, nil
-  cs.display # => "", "", "", "", ""
+  cs = CarStatusTwo.by_id(id) # =>
+  cs.id # =>
+  cs.name # =>
+  cs.display # =>
   {
     imported?: cs.imported?,
     walked?: cs.walked?,
@@ -296,8 +319,10 @@ end
   }
 end
 
-TestAutoGeneratingEverything::WALKED # => 1
+TestAutoGeneratingEverything::WALKED # =>
 
+# ~> -:161:in `name_map_two': uninitialized class variable @@mapping_two in BaseStatusTwo (NameError)
+# ~> 	from -:301:in `<main>'
 # >> {
 # >>              :name => "TestAutoGeneratingEverything",
 # >>     :constant_name => :IMPORTED
