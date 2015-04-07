@@ -1,29 +1,31 @@
+require 'pry'
 require 'mash'
 require 'awesome_print'
 
 class BaseStatus
+  EXAMPLE_STATUS_A = 0
+  EXAMPLE_STATUS_B = 1
+
   class << self
     attr_reader :mapping, :ids, :names, :id_map, :name_map
-
     attr_reader :example_status_a, :example_status_b
+  end
 
-    EXAMPLE_STATUS_A = 0
-    EXAMPLE_STATUS_B = 1
+  @example_status_a = EXAMPLE_STATUS_A
+  @example_status_b = EXAMPLE_STATUS_B
 
-    @example_status_a = EXAMPLE_STATUS_A
-    @example_status_b = EXAMPLE_STATUS_B
+  @mapping = {
+    EXAMPLE_STATUS_A => 'example_status_a',
+    EXAMPLE_STATUS_B => 'example_status_b',
+  }.to_mash
 
-    @mapping = {
-      EXAMPLE_STATUS_A => 'example_status_a',
-      EXAMPLE_STATUS_B => 'example_status_b',
-    }.to_mash
+  @ids = @mapping.keys
+  @names = @mapping.values
 
-    @ids = @mapping.keys
-    @names = @mapping.values
+  @id_map = @mapping.invert.to_mash
+  @name_map = @mapping
 
-    @id_map = @mapping.invert.to_mash
-    @name_map = @mapping
-
+  class << self
     def by_id(id=ids.first)
       new(id)
     end
@@ -33,11 +35,11 @@ class BaseStatus
     end
 
     def id_for(name=names.first)
-      id_map.fetch name
+      id_map.fetch name, nil rescue nil
     end
 
     def name_for(id=ids.first)
-      name_map.fetch id
+      name_map.fetch id, nil rescue nil
     end
   end
 
@@ -48,7 +50,7 @@ class BaseStatus
   end
 
   def display
-    name.titleize
+    name.titleize rescue ''
   end
 
   def example_status_a?
@@ -64,6 +66,8 @@ class CarStatus < BaseStatus
   class << self
     attr_accessor :imported, :walked, :worked, :completed, :hidden
   end
+  attr_reader :mapping, :ids, :names, :id_map, :name_map
+  attr_reader :example_status_a, :example_status_b
 
   IMPORTED  = 0
   WALKED    = 1
@@ -142,7 +146,7 @@ class BaseStatusTwo
     end
 
     def names
-      @@names ||= @@mappings.values
+      @@names ||= @@mapping.values
     end
 
     def id_map
@@ -162,11 +166,11 @@ class BaseStatusTwo
     end
 
     def id_for(name=names.first)
-      id_map.fetch name
+      id_map.fetch name, nil rescue nil
     end
 
     def name_for(id=ids.first)
-      name_map.fetch id
+      name_map.fetch id, nil rescue nil
     end
   end
 
@@ -177,7 +181,7 @@ class BaseStatusTwo
   end
 
   def display
-    name.titleize
+    name.titleize rescue ''
   end
 
   def example_status_a?
@@ -259,11 +263,16 @@ class TestAutoGeneratingEverything
 end
 
 
+CarStatus.ids # => nil
+binding.pry
+CarStatus.names # => nil
+CarStatus.mapping # => nil
+
 [0,1,2,3,4].map do |id|
-  cs = CarStatus.by_id(id) # =>
-  cs.id # =>
-  cs.name # =>
-  cs.display # =>
+  cs = CarStatus.by_id(id) # => #<CarStatus:0x007fef498d79b8 @id=0, @name=nil>, #<CarStatus:0x007fef498d54d8 @id=1, @name=nil>, #<CarStatus:0x007fef498d39f8 @id=2, @name=nil>, #<CarStatus:0x007fef498d15b8 @id=3, @name=nil>, #<CarStatus:0x007fef498cb488 @id=4, @name=nil>
+  cs.id # => 0, 1, 2, 3, 4
+  cs.name # => nil, nil, nil, nil, nil
+  cs.display # => "", "", "", "", ""
   {
     imported?: cs.imported?,
     walked?: cs.walked?,
@@ -274,10 +283,10 @@ end
 end
 
 [0,1,2,3,4].map do |id|
-  cs = CarStatusTwo.by_id(id) # =>
-  cs.id # =>
-  cs.name # =>
-  cs.display # =>
+  cs = CarStatusTwo.by_id(id) # => #<CarStatusTwo:0x007fef498c9020 @id=0, @name=nil>, #<CarStatusTwo:0x007fef498c61e0 @id=1, @name=nil>, #<CarStatusTwo:0x007fef498c3dc8 @id=2, @name=nil>, #<CarStatusTwo:0x007fef498c2360 @id=3, @name=nil>, #<CarStatusTwo:0x007fef498c0bc8 @id=4, @name=nil>
+  cs.id # => 0, 1, 2, 3, 4
+  cs.name # => nil, nil, nil, nil, nil
+  cs.display # => "", "", "", "", ""
   {
     imported?: cs.imported?,
     walked?: cs.walked?,
@@ -287,15 +296,8 @@ end
   }
 end
 
-TestAutoGeneratingEverything.IMPORTED # =>
+TestAutoGeneratingEverything::WALKED # => 1
 
-# ~> -:40:in `name_for': undefined method `fetch' for nil:NilClass (NoMethodError)
-# ~> 	from -:47:in `initialize'
-# ~> 	from -:28:in `new'
-# ~> 	from -:28:in `by_id'
-# ~> 	from -:263:in `block in <main>'
-# ~> 	from -:262:in `map'
-# ~> 	from -:262:in `<main>'
 # >> {
 # >>              :name => "TestAutoGeneratingEverything",
 # >>     :constant_name => :IMPORTED
