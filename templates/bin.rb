@@ -15,7 +15,7 @@ module H
         %w{ examples e ex example }
       end
 
-      def run(args=ARGV.clone)
+      def run(args=ARGV.clone, stdin=$stdin)
         new(args).tap(&:run)
       end
     end
@@ -64,7 +64,7 @@ module H
 
 
   class << self
-    def run(args=ARGV.clone)
+    def run(args=ARGV.clone, stdin=$stdin)
       subcmd = args.shift
 
       handler = handlers.find do |cmdhandler|
@@ -85,55 +85,4 @@ module H
 end
 
 runner = H.run
-
-ap runner: runner, returned_with: runner.returned_with
-
-__END__
-
-{
-       :args => [],
-    :options => {
-        "name" => "josh"
-    }
-}
-{
-           :runner => #<H::BinNameHere::Add:0x007f958908abd0 @args=[], @options=<Mash name="josh">, @returned_with="running the H::BinNameHere::Add command">,
-    :returned_with => "running the H::BinNameHere::Add command"
-}
-
-
-# ran from intentionally bad subcommand
-{
-    :return => "command not found"
-}
-
-
-# ran from add subcommand
-{
-       :args => [],
-    :options => {
-        "name" => "josh"
-    }
-}
-{
-    :return => "running the H::BinNameHere::Add command"
-}
-
-
-{
-    :parsed => {}
-}
-{
-    :return => "running the H::BinNameHere::Add command"
-}
-
-
-
-
-
-:/__END__/+1 r!ruby templates/bin.rb add -n josh; echo; echo
-:/__END__/+1 r!ruby templates/bin.rb a -n josh; echo; echo
-:/__END__/+1 r!ruby templates/bin.rb remove -n josh; echo; echo
-:/__END__/+1 r!ruby templates/bin.rb rm -n josh; echo; echo
-:/__END__/+1 r!ruby templates/bin.rb sub_command_not_found -n josh; echo; echo
 
