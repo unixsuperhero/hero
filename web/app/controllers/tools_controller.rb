@@ -4,6 +4,15 @@ class ToolsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:scratch, :scratch_save]
   before_action :set_scratch, only: [:scratch, :scratch_save]
 
+  def google_history
+    log_dir = format('%s/google', './public')
+    @queries = Dir['%s/*.json' % log_dir].map{|qf|
+      f = IO.read(qf)
+      j = JSON.parse(f)
+      format '<a href="http://hero.dev/google/%s">%s</a><br/>', URI.encode(j['query']), j['query']
+    }
+  end
+
   def google
     log_dir = format('%s/google', './public')
     FileUtils.mkdir_p log_dir

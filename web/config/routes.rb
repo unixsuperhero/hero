@@ -2,6 +2,7 @@ HeroServer::Application.routes.draw do
 
   # Application
   get '/ping' => 'application#ping', as: :ping
+  get '/google/history' => 'tools#google_history', as: :google_history   # used to be bins#google now it is bins#new_google
   get '/google(/:q)' => 'tools#google', as: :google   # used to be bins#google now it is bins#new_google
   get '/scratch' => 'tools#scratch', as: :scratch
   post '/scratch/save' => 'tools#scratch_save', as: :scratch_save

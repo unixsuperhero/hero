@@ -1,13 +1,29 @@
 <html>
 <head>
 <style type="text/css">
+  #topframe {
+    width: 80%;
+    margin: 0 auto;
+    padding: 0;
+  }
+  #topframe input {
+    width: 90%;
+    margin: 0 auto;
+    padding: 10px;
+    line-height: 1.5em;
+      font-size: 1.2em;
+      text-align: center;
+
+  }
   #lframe {
     width: 30%;
     margin: 0;
     padding: 0;
     float: left;
+    overflow: scroll;
+      height: 90%;
   }
-  #lframe #qframe {
+  #topframe #qframe {
     height: 100px;
     width: 100%;
     border: none;
@@ -27,22 +43,21 @@
 
 
 
-<div id="lframe">
+<div id="topframe">
   <form action="http://hero.dev/google" method="get">
     <input type="text" name="q" />
+    <br/>
+    <a href="<%= google_history_url %>" target="rframe">Search History</a>
   </form>
+</div>
+<div id="lframe">
   <p><strong>query: </strong><%= @json['query'] %></p>
   <p><strong>when: </strong><%= @json['when'] %></p>
   <p><strong>epoch: </strong><%= @json['epoch'] %></p>
+  <p><strong>results page: </strong><a target="rframe" href="http://google.com/search?q=<%= URI.encode(@json['query']) %>">Search Results Page</a></p>
   <p><a href="<%= @abs_log %>" target="_blank"><%= @abs_log %></a></p>
-  <div id="queries" style="overflow: scroll; height: 100px; width: 100%">
-    <% @json['queries'].each do |oldsearch| %>
-      <%= raw oldsearch %>
-    <% end %>
-  </div>
   <% [*@json['links']].each do |r| %>
-    <a target="rframe" href="<%= r['iurl'] %>"><%= r['title'] %></a><br/>
-    <%= r['title'] %><br/>
+    <a target="rframe" href="<%= r['iurl'] %>"><%= r['title'].slice(0,60) %></a><br/>
     <br/>
   <% end %>
 </div>

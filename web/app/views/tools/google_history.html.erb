@@ -1,0 +1,36 @@
+<html>
+<head>
+<style type="text/css">
+  #topframe {
+    width: 30%;
+    margin: 0;
+    padding: 0;
+    float: left;
+  }
+  #topframe #qframe {
+    height: 100px;
+    width: 100%;
+    border: none;
+    margin: 10px;
+  }
+  #rframe {
+    width: 69%;
+    height: 90%;
+    border: solid black 1px;
+    margin: 0;
+    padding: 0;
+    float: left;
+  }
+</style>
+</head>
+<body>
+
+
+
+<div id="topframe">
+  <%= raw @queries.join %>
+</div>
+
+
+</body>
+</html>
