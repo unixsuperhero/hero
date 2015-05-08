@@ -7,6 +7,10 @@ HeroServer::Application.routes.draw do
   get '/scratch' => 'tools#scratch', as: :scratch
   post '/scratch/save' => 'tools#scratch_save', as: :scratch_save
 
+  scope '/japanese' do
+    get '/' => 'japanese#index'
+    get '/verbs' => 'japanese#verbs'
+  end
 
   scope '/notes' do
     get '/' => 'notes#index', as: :notes

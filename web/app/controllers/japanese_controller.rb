@@ -1,0 +1,2 @@
+class JapaneseController < ApplicationController
+end
