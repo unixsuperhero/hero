@@ -21,7 +21,7 @@ class DeviantArt < BaseRipper
     end
 
     def rip(args=ARGV.clone)
-      new(args).tap(&:rip)
+      new(args).tap(&:rip).tap(&:open_folders)
     end
   end
 
@@ -50,6 +50,29 @@ class DeviantArt < BaseRipper
     @folder ||= args[1] rescue nil
   end
 
+  def default_folder
+    Date.today.to_s.tap do |f|
+      folder_path(f)
+    end
+  end
+
+  def folder_path(folder)
+    File.join(ripper_path, folder).tap do |f|
+      FileUtils.mkdir_p(f, verbose: true)
+      download_folders.push f unless download_folders.include? f
+    end
+  end
+
+  def download_folders
+    @download_folders ||= []
+  end
+
+  def open_folders
+    download_folders.each do |df|
+      system 'open', df
+    end
+  end
+
   def rip
     puts "Downloading Album: '%s'..." % album
     images.map do |a|
@@ -66,6 +89,14 @@ class DeviantArt < BaseRipper
 
   def doc
     @doc ||= Mechanize.new.get(url)
+  end
+
+  def doc_for_url(url)
+    docs[url] ||= Mechanize.new.get(url)
+  end
+
+  def docs
+    @docs ||= {}.to_mash
   end
 
   def links
